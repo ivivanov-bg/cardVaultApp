@@ -1,9 +1,10 @@
 import { FlatList, StatusBar, StyleSheet, Text, View } from 'react-native'
 import { NavigationContainer } from '@react-navigation/native'
-import { CardList, Card, AddCard } from './components/Card.tsx'
+import { CardList, Card, AddCard } from './components/Card'
 import { createNativeStackNavigator } from '@react-navigation/native-stack'
-
-import { cards } from './data/Data.ts'
+import MainStore from './components/MainStore'
+import { useEffect, useState } from 'react'
+import { cards } from './data/Data'
 
 
 const styles = StyleSheet.create({
@@ -47,17 +48,32 @@ const styles = StyleSheet.create({
 
 });
 
-
-
 const Stack = createNativeStackNavigator();
 
 
 export default function App() {
+
+  useEffect(() => {
+    async() => {
+      // cards.forEach(async (c) => await MainStore.save({
+      //   key: 'cards',
+      //   id: c.code,
+      //   data: {
+      //     title: c.title, 
+      //     code: c.code, 
+      //     format: c.format
+      //   }
+      // }))
+    }
+    
+
+  }, [])
+
   return (
-    <NavigationContainer style={styles.container}>
+    <NavigationContainer>
       <StatusBar />
       <Stack.Navigator
-         screenOptions={{ headerShown: false }} 
+        // screenOptions={{ headerShown: false }} 
       > 
         <Stack.Screen name="Home" component={HomeScreen} />
         <Stack.Screen name="SingleCard" component={Card} />
@@ -87,6 +103,19 @@ const TopBar = ({navigation}) => {
 }
 
 const HomeScreen = (props) => {
+
+  const [cards, loadData] = useState([])
+
+  useEffect(() => {
+
+    const unsubscribe = props.navigation.addListener('focus', async () => {
+      var data = await MainStore.getAllDataForKey('cards')
+      loadData(data);
+    });
+
+    return unsubscribe;
+  }, [props.navigation]);
+
   return (
     <View>
       <TopBar {...props} />

@@ -6,10 +6,13 @@ import {
     TextInput,
     Button,
     TouchableHighlight,
-    StyleSheet } from 'react-native'
+    StyleSheet, 
+    Modal} from 'react-native'
 import { useState, useEffect } from 'react'
 import * as Brightness from 'expo-brightness';
+import MainStore from './MainStore';
 import Barcode from '@kichiyaki/react-native-barcode-generator'
+import BarcodePreview from './BarcodePreview';
 
 const styles = StyleSheet.create({
     listContainer: {
@@ -67,7 +70,8 @@ const styles = StyleSheet.create({
 
 export type CardData = {
   title: string;
-  code: string;
+  barcode: string;
+  format: string;
 };
 
 
@@ -106,7 +110,7 @@ export const Card = ({navigation, route}) => {
       const { status } = await Brightness.requestPermissionsAsync();
       if (status === 'granted') {
         b = await Brightness.getSystemBrightnessAsync()
-        Brightness.setSystemBrightnessAsync(0.6);
+        Brightness.setSystemBrightnessAsync(0.8);
       }
     })();
     
@@ -142,30 +146,51 @@ export const AddCard = ({navigation, route}) => {
   
   const [title, setTitle] = useState("");
   const [barcode, setBarcode] = useState("");
+
+  const [preview, showPreview] = useState(false);
+
+  const save = async (card: CardData) => {
+    await MainStore.save({
+      key: 'cards',
+      id: card.barcode,
+      data: {
+        title: card.title, 
+        code: card.barcode, 
+        format: card.format,
+      }
+    });
+
+    navigation.goBack();
+  }
   
   return (
-     <View style={{...styles.container,
+    <View style={{...styles.container,
                       justifyContent: 'center'}}>
-       <Text style={{textAlign: 'center',}}>ADD NEW CARD</Text>
-       <TextInput 
+      <Text style={{textAlign: 'center',}}>ADD NEW CARD</Text>
+      <TextInput 
          style={styles.input}
          placeholder="Card name"
          onChangeText={setTitle}
          value={title}
-       />
-       <TextInput 
+      />
+      <TextInput 
          style={styles.input}
          placeholder="Barcode"
          onChangeText={setBarcode}
          value={barcode}
-       />
-       <Button title="Save" disabled={!title.length || !barcode.length}
+      />
+      <Button title="Save" disabled={!title.length || !barcode.length}
           onPress={() => {
-           
+            showPreview(true)
           }} 
-       
-       />
-     </View>
+      />
+
+      <Modal visible={preview}>
+        <BarcodePreview navigation={navigation} route={route} barcode={barcode} onSelect={(format: string) => {
+          save({barcode: barcode, title: title, format: format})
+        }}/>
+      </Modal>
+    </View>
   );
 }
 
