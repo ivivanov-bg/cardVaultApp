@@ -94,7 +94,7 @@ export const CardListItem = ({navigation, card}) => {
   return (
     <TouchableHighlight style={styles.listItem} 
       onPress={() => { 
-        navigation.navigate('SingleCard', {card: card})
+        navigation.navigate('Card', {card: card})
       }} >
       <Text> {card.title} </Text>
     </TouchableHighlight>
@@ -106,16 +106,24 @@ export const Card = ({navigation, route}) => {
   
   useEffect(() => {
     var b = 0.1;
+    var bMode: Brightness.BrightnessMode = Brightness.BrightnessMode.UNKNOWN;
     (async () => {
       const { status } = await Brightness.requestPermissionsAsync();
       if (status === 'granted') {
+
+        bMode = await Brightness.getSystemBrightnessModeAsync()
+
         b = await Brightness.getSystemBrightnessAsync()
         Brightness.setSystemBrightnessAsync(0.8);
       }
     })();
     
     return () => {
-      Brightness.setSystemBrightnessAsync(b);
+      if (bMode == Brightness.BrightnessMode.MANUAL) {
+        Brightness.setSystemBrightnessAsync(b);
+      } else {
+        Brightness.setSystemBrightnessModeAsync(Brightness.BrightnessMode.AUTOMATIC);
+      }
     }
   }, []);
   
@@ -150,7 +158,7 @@ export const AddCard = ({navigation, route}) => {
   const [preview, showPreview] = useState(false);
 
   const save = async (card: CardData) => {
-    await MainStore.save({
+    MainStore.save({
       key: 'cards',
       id: card.barcode,
       data: {
@@ -158,9 +166,9 @@ export const AddCard = ({navigation, route}) => {
         code: card.barcode, 
         format: card.format,
       }
-    });
+    }).then( () => navigation.goBack())
+      .catch(error => console.log(error));
 
-    navigation.goBack();
   }
   
   return (

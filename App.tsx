@@ -1,10 +1,10 @@
 import { FlatList, StatusBar, StyleSheet, Text, View } from 'react-native'
 import { NavigationContainer } from '@react-navigation/native'
-import { CardList, Card, AddCard } from './components/Card'
+import { CardList, Card, AddCard } from './components/Cards'
 import { createNativeStackNavigator } from '@react-navigation/native-stack'
 import MainStore from './components/MainStore'
 import { useEffect, useState } from 'react'
-import { cards } from './data/Data'
+import { cards as staticData } from './data/Data'
 
 
 const styles = StyleSheet.create({
@@ -53,22 +53,6 @@ const Stack = createNativeStackNavigator();
 
 export default function App() {
 
-  useEffect(() => {
-    async() => {
-      // cards.forEach(async (c) => await MainStore.save({
-      //   key: 'cards',
-      //   id: c.code,
-      //   data: {
-      //     title: c.title, 
-      //     code: c.code, 
-      //     format: c.format
-      //   }
-      // }))
-    }
-    
-
-  }, [])
-
   return (
     <NavigationContainer>
       <StatusBar />
@@ -76,7 +60,7 @@ export default function App() {
         // screenOptions={{ headerShown: false }} 
       > 
         <Stack.Screen name="Home" component={HomeScreen} />
-        <Stack.Screen name="SingleCard" component={Card} />
+        <Stack.Screen name="Card" component={Card} />
         <Stack.Screen name="AddCard" component={AddCard} />
       </Stack.Navigator>
 
@@ -107,10 +91,21 @@ const HomeScreen = (props) => {
   const [cards, loadData] = useState([])
 
   useEffect(() => {
+      // staticData.forEach(async (c) => await MainStore.save({
+      //     key: 'cards',
+      //     id: c.code,
+      //     data: {
+      //       title: c.title, 
+      //       code: c.code, 
+      //       format: c.format
+      //     }
+      //   }))
 
     const unsubscribe = props.navigation.addListener('focus', async () => {
-      var data = await MainStore.getAllDataForKey('cards')
-      loadData(data);
+
+      MainStore.getAllDataForKey('cards')
+               .then( data => loadData(data))
+               .catch( error => MainStore.clearMapForKey('cards'))
     });
 
     return unsubscribe;
