@@ -7,7 +7,14 @@ import {
     Button,
     TouchableHighlight,
     StyleSheet, 
-    Modal} from 'react-native'
+    Modal
+} from 'react-native'
+import {
+    Menu,
+    MenuOptions,
+    MenuOption,
+    MenuTrigger,
+} from 'react-native-popup-menu';
 import { useState, useEffect } from 'react'
 import * as Brightness from 'expo-brightness';
 import MainStore from './MainStore';
@@ -70,33 +77,61 @@ const styles = StyleSheet.create({
 
 export type CardData = {
   title: string;
-  barcode: string;
+  code: string;
   format: string;
 };
 
 
-export const CardList = ({navigation, data}) => {
+export const CardList = (
+    {navigation, data, onDelete}
+  :{data: Array<CardData>}
+) => {
+  
   return (
     <View style={styles.listContainer} >
        <FlatList
           data={data}
           renderItem={ ({item}) => 
             <CardListItem navigation={navigation} 
-                          card={item} /> 
+                          card={item} 
+                          onDelete={onDelete}/> 
           }
        />
     </View>
   );
 }
 
-export const CardListItem = ({navigation, card}) => {
+export const CardListItem = ({
+    navigation, 
+    card, 
+    onDelete,
+} : { card: CardData }
+
+) => {
+    
+  var menu;;
  
   return (
-    <TouchableHighlight style={styles.listItem} 
+    <TouchableHighlight  
+      onLongPress={()=>menu.open()}
+      
       onPress={() => { 
         navigation.navigate('Card', {card: card})
       }} >
-      <Text> {card.title} </Text>
+      <View style={styles.listItem} >
+        <Text> {card.title} </Text>
+        <Menu ref={c => (menu = c)} >
+            <MenuTrigger text='' />
+            <MenuOptions>
+              <MenuOption text={card.title} disabled={true}/>
+              <MenuOption onSelect={() => alert(`Save`)} 
+                          text='Save' />
+              <MenuOption onSelect={() => onDelete(card)} >
+                <Text style={{color: 'red'}}>Delete</Text>
+              </MenuOption>
+            </MenuOptions>
+        </Menu>
+      </View>
     </TouchableHighlight>
   );
 }
