@@ -195,7 +195,11 @@ export const AddCard = ({navigation, route}) => {
 
       <Modal visible={preview}>
         <BarcodePreview navigation={navigation} route={route} barcode={barcode} onSelect={(format: string) => {
-          save({barcode: barcode, title: title, format: format})
+          if (format !== null) {
+            save({barcode: barcode, title: title, format: format})
+          } else {
+              showPreview(false)
+          }
         }}/>
       </Modal>
     </View>

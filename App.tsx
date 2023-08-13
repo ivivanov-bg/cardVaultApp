@@ -91,15 +91,15 @@ const HomeScreen = (props) => {
   const [cards, loadData] = useState([])
 
   useEffect(() => {
-      // staticData.forEach(async (c) => await MainStore.save({
-      //     key: 'cards',
-      //     id: c.code,
-      //     data: {
-      //       title: c.title, 
-      //       code: c.code, 
-      //       format: c.format
-      //     }
-      //   }))
+       staticData.forEach(async (c) => await MainStore.save({
+           key: 'cards',
+           id: c.code,
+           data: {
+             title: c.title, 
+             code: c.code, 
+             format: c.format
+           }
+         }))
 
     const unsubscribe = props.navigation.addListener('focus', async () => {
 
