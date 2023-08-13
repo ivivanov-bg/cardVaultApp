@@ -109,23 +109,28 @@ export const CardListItem = ({
 
 ) => {
     
-  var menu;;
+  var menu;
+  const show = (card) => {
+      navigation.navigate('Card', {card: card})
+  }
+  
+  const edit = (card) => {
+      navigation.navigate('EditCard', {card: card})
+  }
  
   return (
     <TouchableHighlight  
       onLongPress={()=>menu.open()}
-      
-      onPress={() => { 
-        navigation.navigate('Card', {card: card})
-      }} >
+      onPress={() => show(card)}
+    >
       <View style={styles.listItem} >
         <Text> {card.title} </Text>
         <Menu ref={c => (menu = c)} >
             <MenuTrigger text='' />
             <MenuOptions>
               <MenuOption text={card.title} disabled={true}/>
-              <MenuOption onSelect={() => alert(`Save`)} 
-                          text='Save' />
+              <MenuOption onSelect={() => edit(card)} 
+                          text='Edit' />
               <MenuOption onSelect={() => onDelete(card)} >
                 <Text style={{color: 'red'}}>Delete</Text>
               </MenuOption>
@@ -187,8 +192,9 @@ export const Card = ({navigation, route}) => {
 
 export const AddCard = ({navigation, route}) => {
   
-  const [title, setTitle] = useState("");
-  const [barcode, setBarcode] = useState("");
+  const card = route.params.card ??= { title: '', code: ''}
+  const [title, setTitle] = useState(card.title)
+  const [barcode, setBarcode] = useState(card.code)
 
   const [preview, showPreview] = useState(false);
 
@@ -209,7 +215,7 @@ export const AddCard = ({navigation, route}) => {
   return (
     <View style={{...styles.container,
                       justifyContent: 'center'}}>
-      <Text style={{textAlign: 'center',}}>ADD NEW CARD</Text>
+      <Text style={{textAlign: 'center',}}>Card Details</Text>
       <TextInput 
          style={styles.input}
          placeholder="Card name"

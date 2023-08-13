@@ -64,6 +64,7 @@ export default function App() {
             <Stack.Screen name="Home" component={HomeScreen} />
             <Stack.Screen name="Card" component={Card} />
             <Stack.Screen name="AddCard" component={AddCard} />
+            <Stack.Screen name="EditCard" component={AddCard} />
           </Stack.Navigator>
         </NavigationContainer>
     </MenuProvider>
@@ -78,7 +79,7 @@ const TopBar = ({navigation}) => {
         <Text style={styles.topBarItem}>Top Bar</Text>
         <Text style={styles.topBarItem}
               onPress={() => 
-                navigation.navigate('AddCard')
+                navigation.navigate('AddCard', {})
               } 
         >
           ADD CARD
