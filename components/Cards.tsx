@@ -62,7 +62,6 @@ const styles = StyleSheet.create({
       borderBottomWidth: 1,
       padding: 10,
     },
-    
 });
 
 export type CardData = {
@@ -184,6 +183,7 @@ export const AddCard = ({navigation, route, onSave}
   const card = route.params.card ??= { title: '', code: ''}
   const [title, setTitle] = useState(card.title)
   const [barcode, setBarcode] = useState(card.code)
+  const [format, setFormat] = useState(null)
 
   const [preview, showPreview] = useState(false);
 
@@ -203,9 +203,25 @@ export const AddCard = ({navigation, route, onSave}
          onChangeText={setBarcode}
          value={barcode}
       />
+
+      <Button title="Scan" style={styles.input}
+          onPress={() => {
+            navigation.navigate('Scan', {onScanned: ({format, data}) => {
+                alert(`Bar code with type ${format} and data ${data} has been scanned!`)
+                setBarcode(data)
+                setFormat(format)
+            }})
+          }} 
+      />
+      
       <Button title="Save" disabled={!title.length || !barcode.length}
           onPress={() => {
-            showPreview(true)
+            if(format === null) {
+              showPreview(true)
+            } else {
+              onSave({barcode: barcode, title: title, format: format})
+              navigation.goBack()
+            }
           }} 
       />
 

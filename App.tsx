@@ -4,6 +4,7 @@ import { CardList, Card, AddCard } from './components/Cards'
 import { createNativeStackNavigator } from '@react-navigation/native-stack'
 import { MenuProvider } from 'react-native-popup-menu';
 import MainStore from './components/MainStore'
+import Scanner from './components/BarcodeScanner'
 import { useEffect, useState } from 'react'
 import { cards as staticData } from './data/Data'
 
@@ -106,6 +107,7 @@ export default function App() {
             }
             </Stack.Screen>
             <Stack.Screen name="EditCard" component={AddCard} />
+            <Stack.Screen name="Scan" component={Scanner} />
           </Stack.Navigator>
         </NavigationContainer>
     </MenuProvider>
