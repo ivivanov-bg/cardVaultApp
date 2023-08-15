@@ -5,7 +5,7 @@ import {
     Text, 
     TextInput,
     Button,
-    TouchableHighlight,
+    TouchableOpacity,
     StyleSheet, 
     Modal
 } from 'react-native'
@@ -83,8 +83,11 @@ export type CardData = {
 
 
 export const CardList = (
-    {navigation, data, onDelete}
-  :{data: Array<CardData>}
+    {navigation, data, onDelete, onAdd}
+  :{data: Array<CardData>, 
+    onDelete: (c: CardData) => any,
+    onAdd: (c: CardData) => any,
+  }
 ) => {
   
   return (
@@ -119,7 +122,7 @@ export const CardListItem = ({
   }
  
   return (
-    <TouchableHighlight  
+    <TouchableOpacity  
       onLongPress={()=>menu.open()}
       onPress={() => show(card)}
     >
@@ -127,7 +130,9 @@ export const CardListItem = ({
         <Text> {card.title} </Text>
         <Menu ref={c => (menu = c)} >
             <MenuTrigger text='' />
-            <MenuOptions>
+            <MenuOptions customStyles={{
+                optionWrapper: styles.listItem
+            }}>
               <MenuOption text={card.title} disabled={true}/>
               <MenuOption onSelect={() => edit(card)} 
                           text='Edit' />
@@ -137,7 +142,7 @@ export const CardListItem = ({
             </MenuOptions>
         </Menu>
       </View>
-    </TouchableHighlight>
+    </TouchableOpacity>
   );
 }
 
@@ -190,7 +195,10 @@ export const Card = ({navigation, route}) => {
   );
 }
 
-export const AddCard = ({navigation, route}) => {
+export const AddCard = ({navigation, route, onSave}
+:{
+    onSave: (c: CardData) => any
+}) => {
   
   const card = route.params.card ??= { title: '', code: ''}
   const [title, setTitle] = useState(card.title)
@@ -198,20 +206,6 @@ export const AddCard = ({navigation, route}) => {
 
   const [preview, showPreview] = useState(false);
 
-  const save = async (card: CardData) => {
-    MainStore.save({
-      key: 'cards',
-      id: card.barcode,
-      data: {
-        title: card.title, 
-        code: card.barcode, 
-        format: card.format,
-      }
-    }).then( () => navigation.goBack())
-      .catch(error => console.log(error));
-
-  }
-  
   return (
     <View style={{...styles.container,
                       justifyContent: 'center'}}>
@@ -237,7 +231,8 @@ export const AddCard = ({navigation, route}) => {
       <Modal visible={preview}>
         <BarcodePreview navigation={navigation} route={route} barcode={barcode} onSelect={(format: string) => {
           if (format !== null) {
-            save({barcode: barcode, title: title, format: format})
+            onSave({barcode: barcode, title: title, format: format})
+            navigation.goBack()
           } else {
               showPreview(false)
           }

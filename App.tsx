@@ -54,6 +54,39 @@ const Stack = createNativeStackNavigator();
 
 export default function App() {
 
+  const save = (card: CardData, callback = null) => {
+      MainStore.save({
+      key: 'cards',
+      id: card.barcode,
+      data: {
+        title: card.title, 
+        code: card.barcode, 
+        format: card.format,
+      }
+    }).then( () => {
+        if (callback !== null) { 
+            load(callback) 
+        }
+    })
+      .catch(error => console.error(error));
+  }
+
+  const load = (callback) => {
+      MainStore.getAllDataForKey('cards')
+               .then( data => callback(data))
+               .catch( error => {
+                   console.error(error)
+                   MainStore.clearMapForKey('cards')
+                })
+  }
+
+  const remove = (card: CardData, callback) => {
+     MainStore.remove({
+      key: 'cards',
+      id: card.code,
+    }).then(() => load(callback))
+  }
+
   return (
     <MenuProvider>
         <NavigationContainer>
@@ -61,9 +94,17 @@ export default function App() {
           <Stack.Navigator
             // screenOptions={{ headerShown: false }} 
           > 
-            <Stack.Screen name="Home" component={HomeScreen} />
+            <Stack.Screen name="Home">
+            { props => 
+              <HomeScreen {...props} onLoad={load} onDelete={remove} />
+            }
+            </Stack.Screen>
             <Stack.Screen name="Card" component={Card} />
-            <Stack.Screen name="AddCard" component={AddCard} />
+            <Stack.Screen name="AddCard">
+            { props => 
+              <AddCard {...props} onSave={save} />
+            }
+            </Stack.Screen>
             <Stack.Screen name="EditCard" component={AddCard} />
           </Stack.Navigator>
         </NavigationContainer>
@@ -93,11 +134,11 @@ const HomeScreen = (props) => {
 
   const [cards, setCards] = useState([])
   
-  const loadData = () => {
-      MainStore.getAllDataForKey('cards')
-               .then( data => setCards(data))
-               .catch( error => MainStore.clearMapForKey('cards'))
-  }
+
+
+  useEffect(() => {
+    props.onLoad(setCards)
+  }, [])
 
   useEffect(() => {
      //  staticData.forEach(async (c) => await MainStore.save({
@@ -110,31 +151,20 @@ const HomeScreen = (props) => {
      //      }
      //    }))
 
-    const unsubscribe = props.navigation.addListener('focus', async () => loadData());
+    const unsubscribe = props.navigation.addListener('focus', async () => props.onLoad(setCards));
 
     return unsubscribe;
   }, [props.navigation]);
   
-  const remove = (card: CardData) => {
-      
-//      alert('Removing: ' + JSON.stringify(card))
-     MainStore.remove({
-      key: 'cards',
-      id: card.code,
-    }).then(() => loadData())
-  }
 
   return (
     <View>
       <TopBar {...props} />
-      <CardList {...props} data={cards} onDelete={remove} />
+      <CardList {...props} data={cards} onDelete={(c) => {
+          props.onDelete(c, setCards)
+      }} />
     </View>
   );
 }
-
-
-
-
-
 
 
