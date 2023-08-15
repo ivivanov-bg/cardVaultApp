@@ -19,7 +19,7 @@ import { useState, useEffect } from 'react'
 import * as Brightness from 'expo-brightness';
 import MainStore from './MainStore';
 import Barcode from '@kichiyaki/react-native-barcode-generator'
-import BarcodePreview from './BarcodePreview';
+import BarcodePreview, { PreviewItem } from './BarcodePreview';
 
 const styles = StyleSheet.create({
     listContainer: {
@@ -45,24 +45,14 @@ const styles = StyleSheet.create({
         paddingLeft: 8,
         paddingRight: 8,
         alignItems: 'stretch',
-        alignContent: 'center',
-    },
-    
-    barcode: {
-        paddingTop: 50,
-        paddingBottom: 50,
-    },
-    
-    barcodeText: {
-        paddingTop: 12,
-        fontSize: 16,
-        fontWeight: '500',
+        justifyContent: 'top',
     },
     
     headerTitle: {
         fontSize: 64,
         fontWeight: '800',
         textAlign: 'center',
+        marginBottom: 50,
     },
     
     input: {
@@ -174,23 +164,14 @@ export const Card = ({navigation, route}) => {
   
   return (
     <View style={styles.container}>
-      <View>
         <Text style={styles.headerTitle} 
               adjustsFontSizeToFit={true}
               numberOfLines={1}
         > 
           {card.title} 
         </Text>
-      </View>
-      <Barcode value={card.code} 
-               format={card.format} 
-               text={card.code} 
-               height= {150} 
-               width={3}
-               maxWidth={350}
-               style={styles.barcode}
-               textStyle={styles.barcodeText}
-      />
+        <PreviewItem barcode={card.code} 
+                   format={card.format} />
     </View>
   );
 }
