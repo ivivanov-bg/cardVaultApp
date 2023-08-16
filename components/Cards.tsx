@@ -7,7 +7,7 @@ import {
     Button,
     TouchableOpacity,
     StyleSheet, 
-    Modal
+    Modal,
 } from 'react-native'
 import {
     Menu,
@@ -15,11 +15,14 @@ import {
     MenuOption,
     MenuTrigger,
 } from 'react-native-popup-menu';
+import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { useState, useEffect } from 'react'
 import * as Brightness from 'expo-brightness';
 import MainStore from './MainStore';
 import Barcode from '@kichiyaki/react-native-barcode-generator'
-import BarcodePreview, { PreviewItem } from './BarcodePreview';
+import { BarcodePreview, BarcodeList } from './BarcodePreview';
+import { CardData } from '../model/Card.ts'
+import { ScanScreenProps, Scanned } from './BarcodeScanner'
 
 const styles = StyleSheet.create({
     listContainer: {
@@ -45,7 +48,7 @@ const styles = StyleSheet.create({
         paddingLeft: 8,
         paddingRight: 8,
         alignItems: 'stretch',
-        justifyContent: 'top',
+        justifyContent: 'flex-start',
     },
     
     headerTitle: {
@@ -64,18 +67,31 @@ const styles = StyleSheet.create({
     },
 });
 
-export type CardData = {
-  title: string;
-  code: string;
-  format: string;
-};
+type HomeScreenProps = NativeStackScreenProps<{
+    Card: {card: CardData},
+    EditCard: {card: CardData},
+}>
+type HomeScreenNavigation = HomeScreenProps['navigation']
+type HomeScreenRoute = HomeScreenProps['route']
+
+export type CardScreenProps = NativeStackScreenProps<{
+    Card: {card: CardData},
+}, 'Card'>
+
+export type EditCardScreenProps = NativeStackScreenProps<{
+    EditCard: {card: CardData},
+    Scan: ScanScreenProps,
+}, 'EditCard'>
+
 
 
 export const CardList = (
     {navigation, data, onDelete, onAdd}
-  :{data: Array<CardData>, 
-    onDelete: (c: CardData) => any,
-    onAdd: (c: CardData) => any,
+   :{
+      navigation: HomeScreenNavigation
+      data: Array<CardData>, 
+      onDelete: (c: CardData) => void,
+      onAdd: (c: CardData) => void,
   }
 ) => {
   
@@ -85,7 +101,7 @@ export const CardList = (
           data={data}
           renderItem={ ({item}) => 
             <CardListItem navigation={navigation} 
-                          card={item} 
+                          card = {item} 
                           onDelete={onDelete}/> 
           }
        />
@@ -97,16 +113,20 @@ export const CardListItem = ({
     navigation, 
     card, 
     onDelete,
-} : { card: CardData }
+} : {
+    navigation: HomeScreenNavigation,
+    card: CardData,
+    onDelete: (c: CardData) => void,
+}
 
 ) => {
     
   var menu;
-  const show = (card) => {
+  const show = (card: CardData) => {
       navigation.navigate('Card', {card: card})
   }
   
-  const edit = (card) => {
+  const edit = (card: CardData) => {
       navigation.navigate('EditCard', {card: card})
   }
  
@@ -135,8 +155,8 @@ export const CardListItem = ({
   );
 }
 
-export const Card = ({navigation, route}) => {
-  const card = route.params.card
+export const Card = ({navigation, route} :CardScreenProps) => {
+  const card: CardData = route.params.card
   
   useEffect(() => {
     var b = 0.1;
@@ -169,20 +189,20 @@ export const Card = ({navigation, route}) => {
         > 
           {card.title} 
         </Text>
-        <PreviewItem barcode={card.code} 
+        <BarcodePreview barcode={card.barcode} 
                    format={card.format} />
     </View>
   );
 }
 
 export const AddCard = ({navigation, route, onSave}
-:{
-    onSave: (c: CardData) => any
+: EditCardScreenProps & {  
+    onSave: (card: CardData) => any
 }) => {
   
-  const card = route.params.card ?? { title: '', code: ''}
+  const card = route.params.card ?? { title: '', barcode: '', format: null}
   const [title, setTitle] = useState(card.title)
-  const [barcode, setBarcode] = useState(card.code)
+  const [barcode, setBarcode] = useState(card.barcode)
   const [format, setFormat] = useState(card.format)
 
   const [preview, showPreview] = useState(false);
@@ -204,9 +224,9 @@ export const AddCard = ({navigation, route, onSave}
          value={barcode}
       />
 
-      <Button title="Scan" style={styles.input}
+      <Button title="Scan"
           onPress={() => {
-            navigation.navigate('Scan', {onScanned: ({format, data}) => {
+            navigation.navigate('Scan', {onScanned: ({format, data}: Scanned) => {
                 alert(`Bar code with type ${format} and data ${data} has been scanned!`)
                 setBarcode(data)
                 setFormat(format)
@@ -216,8 +236,8 @@ export const AddCard = ({navigation, route, onSave}
       
       <Button title="Save" disabled={!title.length || !barcode.length}
           onPress={() => {
-            if (barcode !== card.code) {
-                alert('Changed from ' + card.code + ' to ' + barcode)
+            if (barcode !== card.barcode) {
+                alert('Changed from ' + card.barcode + ' to ' + barcode)
             }
             if(format === null) {
               showPreview(true)
@@ -229,7 +249,7 @@ export const AddCard = ({navigation, route, onSave}
       />
 
       <Modal visible={preview}>
-        <BarcodePreview navigation={navigation} route={route} barcode={barcode} onSelect={(format: string) => {
+        <BarcodeList navigation={navigation} route={route} barcode={barcode} onSelect={(format: string) => {
           if (format !== null) {
             onSave({barcode: barcode, title: title, format: format})
             navigation.goBack()

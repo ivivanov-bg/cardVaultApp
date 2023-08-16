@@ -1,11 +1,21 @@
 import React, { useState, useEffect } from 'react';
 import { Text, View, StyleSheet, Button } from 'react-native';
 import { BarCodeScanner } from 'expo-barcode-scanner';
+import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 
-export default Scanner = ({
+export type Scanned = {format: any, data: string}
+export type ScanScreenProps = { onScanned: ({format, data}: Scanned) => void }
+
+export type ScanNav = NativeStackScreenProps<{
+    Scan: ScanScreenProps
+}, 'Scan'>
+
+
+
+const Scanner = ({
     navigation, 
     route,
-}) => {
+}: ScanNav) => {
 const [hasPermission, setHasPermission] = useState(null);
   const [scanned, setScanned] = useState(false);
   
@@ -58,3 +68,4 @@ const styles = StyleSheet.create({
   },
 });
 
+export default Scanner

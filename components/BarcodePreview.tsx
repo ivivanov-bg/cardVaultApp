@@ -32,7 +32,7 @@ const styles = StyleSheet.create({
 })
 
 
-export const PreviewItem = ({ 
+export const BarcodePreview = ({ 
     barcode, 
     format, 
     onSelect = (c) => {}, 
@@ -65,8 +65,8 @@ export const PreviewItem = ({
                 }
                 
                 { format === 'QR' && 
-                <View style={style}>
-                    <QRCode style={styles.barcode}
+                <View style={styles.container}>
+                    <QRCode
                             size={200}
                             value={barcode} />
                     <Text style={styles.barcodeText}>
@@ -80,7 +80,7 @@ export const PreviewItem = ({
     );
 }
 
-const BarcodePreview = ({navigation, route, barcode, onSelect}) => {
+export const BarcodeList = ({navigation, route, barcode, onSelect}) => {
     
     const types = [
         'CODE39',
@@ -109,7 +109,7 @@ const BarcodePreview = ({navigation, route, barcode, onSelect}) => {
               data={types}
               renderItem={ ({item}) => {
                 return (
-                    <PreviewItem barcode={barcode} 
+                    <BarcodePreview barcode={barcode} 
                                  format={item}
                                  onSelect={onSelect}
                     />
@@ -124,6 +124,4 @@ const BarcodePreview = ({navigation, route, barcode, onSelect}) => {
         </SafeAreaView>
     );
 }
-
-export default BarcodePreview
 

@@ -1,12 +1,13 @@
 import { FlatList, StatusBar, StyleSheet, Text, View } from 'react-native'
 import { NavigationContainer } from '@react-navigation/native'
-import { CardList, Card, AddCard } from './components/Cards'
+import { CardList, Card, AddCard , CardScreenProps, EditCardScreenProps } from './components/Cards'
 import { createNativeStackNavigator } from '@react-navigation/native-stack'
 import { MenuProvider } from 'react-native-popup-menu';
 import MainStore from './components/MainStore'
 import Scanner from './components/BarcodeScanner'
 import { useEffect, useState } from 'react'
 import { cards as staticData } from './data/Data'
+import { CardData } from './model/Card.ts'
 
 
 const styles = StyleSheet.create({
@@ -55,13 +56,13 @@ const Stack = createNativeStackNavigator();
 
 export default function App() {
 
-  const save = (card, callback = null) => {
+  const save = (card: CardData, callback = null) => {
       MainStore.save({
       key: 'cards',
       id: card.barcode,
       data: {
         title: card.title, 
-        code: card.barcode, 
+        barcode: card.barcode, 
         format: card.format,
       }
     }).then( () => {
@@ -84,7 +85,7 @@ export default function App() {
   const remove = (card: CardData, callback) => {
      MainStore.remove({
       key: 'cards',
-      id: card.code,
+      id: card.barcode,
     }).then(() => load(callback))
   }
 
@@ -101,13 +102,8 @@ export default function App() {
             }
             </Stack.Screen>
             <Stack.Screen name="Card" component={Card} />
-            <Stack.Screen name="AddCard">
-            { props => 
-              <AddCard {...props} onSave={save} />
-            }
-            </Stack.Screen>
             <Stack.Screen name="EditCard">
-            { props => 
+            { (props: EditCardScreenProps) => 
               <AddCard {...props} onSave={save} />
             }
             </Stack.Screen>
@@ -126,7 +122,7 @@ const TopBar = ({navigation}) => {
         <Text style={styles.topBarItem}>Top Bar</Text>
         <Text style={styles.topBarItem}
               onPress={() => 
-                navigation.navigate('AddCard', {})
+                navigation.navigate('EditCard', {})
               } 
         >
           ADD CARD
@@ -138,7 +134,7 @@ const TopBar = ({navigation}) => {
 
 const HomeScreen = (props) => {
 
-  const [cards, setCards] = useState([])
+  const [cards, setCards] = useState<Array<CardData>>([])
   
 
 
@@ -149,10 +145,10 @@ const HomeScreen = (props) => {
   useEffect(() => {
      //  staticData.forEach(async (c) => await MainStore.save({
      //      key: 'cards',
-     //      id: c.code,
+     //      id: c.barcode,
      //      data: {
      //        title: c.title, 
-     //        code: c.code, 
+     //        barcode: c.barcode, 
      //        format: c.format
      //      }
      //    }))
