@@ -28,7 +28,8 @@ const [hasPermission, setHasPermission] = useState(null);
   const handleBarCodeScanned = ({ type, data }) => {
     setScanned(true);
     var format = BarcodeMap[type] ?? type
-    route.props.onScanned({format, data})
+    route.params.onScanned({format, data})
+    navigation.goBack()
   };
 
   if (hasPermission === null) {
