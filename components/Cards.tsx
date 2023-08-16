@@ -6,8 +6,10 @@ import {
     TextInput,
     Button,
     TouchableOpacity,
+    TouchableWithoutFeedback,
     StyleSheet, 
     Modal,
+    Image,
 } from 'react-native'
 import {
     Menu,
@@ -208,8 +210,7 @@ export const AddCard = ({navigation, route, onSave}
   const [preview, showPreview] = useState(false);
 
   return (
-    <View style={{...styles.container,
-                      justifyContent: 'center'}}>
+    <View style={styles.container}>
       <Text style={{textAlign: 'center',}}>Card Details</Text>
       <TextInput 
          style={styles.input}
@@ -223,17 +224,28 @@ export const AddCard = ({navigation, route, onSave}
          onChangeText={setBarcode}
          value={barcode}
       />
-
-      <Button title="Scan"
-          onPress={() => {
+      
+      <TouchableOpacity onPress={() => {
             navigation.navigate('Scan', {onScanned: ({format, data}: Scanned) => {
-                alert(`Bar code with type ${format} and data ${data} has been scanned!`)
+ //               alert(`Bar code with type ${format} and data ${data} has been scanned!`)
                 setBarcode(data)
                 setFormat(format)
             }})
-          }} 
-      />
-      
+          }} style={{alignItems: 'center', 
+                     paddingTop: 20, 
+                     paddingBottom: 40,
+          }}><>
+          <Text>SCAN THE BARCODE</Text>
+          <Image 
+            source={require('../assets/scan.png')} 
+            style={{width: 120, 
+                    height: 100, 
+                    }}
+          
+          />
+          </>
+      </TouchableOpacity>
+
       <Button title="Save" disabled={!title.length || !barcode.length}
           onPress={() => {
             if (barcode !== card.barcode) {
