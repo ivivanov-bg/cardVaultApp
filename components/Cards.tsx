@@ -180,10 +180,10 @@ export const AddCard = ({navigation, route, onSave}
     onSave: (c: CardData) => any
 }) => {
   
-  const card = route.params.card ??= { title: '', code: ''}
+  const card = route.params.card ?? { title: '', code: ''}
   const [title, setTitle] = useState(card.title)
   const [barcode, setBarcode] = useState(card.code)
-  const [format, setFormat] = useState(null)
+  const [format, setFormat] = useState(card.format)
 
   const [preview, showPreview] = useState(false);
 
@@ -216,6 +216,9 @@ export const AddCard = ({navigation, route, onSave}
       
       <Button title="Save" disabled={!title.length || !barcode.length}
           onPress={() => {
+            if (barcode !== card.code) {
+                alert('Changed from ' + card.code + ' to ' + barcode)
+            }
             if(format === null) {
               showPreview(true)
             } else {

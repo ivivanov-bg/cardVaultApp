@@ -55,7 +55,7 @@ const Stack = createNativeStackNavigator();
 
 export default function App() {
 
-  const save = (card: CardData, callback = null) => {
+  const save = (card, callback = null) => {
       MainStore.save({
       key: 'cards',
       id: card.barcode,
@@ -106,7 +106,11 @@ export default function App() {
               <AddCard {...props} onSave={save} />
             }
             </Stack.Screen>
-            <Stack.Screen name="EditCard" component={AddCard} />
+            <Stack.Screen name="EditCard">
+            { props => 
+              <AddCard {...props} onSave={save} />
+            }
+            </Stack.Screen>
             <Stack.Screen name="Scan" component={Scanner} />
           </Stack.Navigator>
         </NavigationContainer>
