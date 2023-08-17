@@ -40,7 +40,11 @@ const styles = StyleSheet.create({
       height: 40,
       borderBottomWidth: 1,
       borderColor: '#F0F0F0',
-      justifyContent: 'center',
+      justifyContent: 'flex-start',
+      flex: 1,
+      flexDirection: 'row',
+      alignItems: 'center',
+      fontWeight: 500,
     },
     
     container: {
@@ -131,13 +135,33 @@ export const CardListItem = ({
   const edit = (card: CardData) => {
       navigation.navigate('EditCard', {card: card})
   }
+  
+  
  
+  const ImageMap = {
+      'metro': require('../assets/logos/metro.jpg'),
+      'billa': require('../assets/logos/billa.png'),
+      'default': require('../assets/logos/none.png')
+  }
+  
+  const img = ImageMap[card.logo] ?? ImageMap['default']
+  
+  
   return (
+      
     <TouchableOpacity  
       onLongPress={()=>menu.open()}
       onPress={() => show(card)}
     >
       <View style={styles.listItem} >
+        <Image 
+            source={img} 
+            resizeMode='stretch'
+            style={{
+                width: 48, height: 36, 
+                paddingLeft: 5, paddingRight: 5,
+            }}
+        />
         <Text> {card.title} </Text>
         <Menu ref={c => (menu = c)} >
             <MenuTrigger text='' />
@@ -202,10 +226,11 @@ export const AddCard = ({navigation, route, onSave}
     onSave: (card: CardData) => any
 }) => {
   
-  const card = route.params.card ?? { title: '', barcode: '', format: null}
+  const card = route.params.card ?? { title: '', barcode: '', format: null, logo: '' }
   const [title, setTitle] = useState(card.title)
   const [barcode, setBarcode] = useState(card.barcode)
   const [format, setFormat] = useState(card.format)
+  const [logo, setLogo] = useState(card.logo)
 
   const [preview, showPreview] = useState(false);
 
@@ -245,6 +270,13 @@ export const AddCard = ({navigation, route, onSave}
           />
           </>
       </TouchableOpacity>
+      
+      <TextInput 
+         style={styles.input}
+         placeholder="Logo"
+         onChangeText={setLogo}
+         value={logo}
+      />
 
       <Button title="Save" disabled={!title.length || !barcode.length}
           onPress={() => {
@@ -254,7 +286,12 @@ export const AddCard = ({navigation, route, onSave}
             if(format === null) {
               showPreview(true)
             } else {
-              onSave({barcode: barcode, title: title, format: format})
+              onSave({
+                barcode: barcode, 
+                title: title, 
+                format: format,
+                logo: logo,
+              })
               navigation.goBack()
             }
           }} 

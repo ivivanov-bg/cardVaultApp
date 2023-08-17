@@ -11,7 +11,6 @@ export type ScanNav = NativeStackScreenProps<{
 }, 'Scan'>
 
 
-
 const Scanner = ({
     navigation, 
     route,
@@ -65,6 +64,7 @@ const styles = StyleSheet.create({
     flex: 1,
     flexDirection: 'column',
     justifyContent: 'center',
+    alignItems: 'center'
   },
 });
 

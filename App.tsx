@@ -60,11 +60,7 @@ export default function App() {
       MainStore.save({
       key: 'cards',
       id: card.barcode,
-      data: {
-        title: card.title, 
-        barcode: card.barcode, 
-        format: card.format,
-      }
+      data: card
     }).then( () => {
         if (callback !== null) { 
             load(callback) 
