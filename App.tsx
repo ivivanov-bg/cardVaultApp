@@ -1,4 +1,4 @@
-import { FlatList, StatusBar, StyleSheet, Text, View } from 'react-native'
+import { FlatList, StatusBar, StyleSheet, Text, View, TouchableOpacity } from 'react-native'
 import { NavigationContainer } from '@react-navigation/native'
 import { CardList, Card, AddCard , CardScreenProps, EditCardScreenProps } from './components/Cards'
 import { createNativeStackNavigator } from '@react-navigation/native-stack'
@@ -14,12 +14,11 @@ const styles = StyleSheet.create({
 
   topBar: {
     borderBottomWidth: 1,
-    height: 40,
+    height: 50,
     alignItems: 'center',
     justifyContent: 'center',
     marginRight: 12,
     marginLeft: 12,
-    marginTop: 12,
     borderColor: '#F0F0F0',
   },
   
@@ -28,14 +27,14 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'center',
     alignItems: 'center',
-    gap: 20,
   },
   
   topBarItem: {
     flexGrow: 1,
-    justifyContent: 'center',
+//    borderWidth: 1,
     alignItems: 'center',
-    textAlign: 'center',
+    justifyContent: 'center',
+    height: '100%',
   },
 
   container: {
@@ -115,14 +114,15 @@ const TopBar = ({navigation}) => {
   return (
     <View style={styles.topBar}>
       <View style={styles.topBarInner}>
-        <Text style={styles.topBarItem}>Top Bar</Text>
-        <Text style={styles.topBarItem}
+        <View style={styles.topBarItem}>
+            <Text>...</Text>
+        </View>
+        <TouchableOpacity style={styles.topBarItem}
               onPress={() => 
                 navigation.navigate('EditCard', {})
-              } 
-        >
-          ADD CARD
-        </Text>
+              } >
+            <Text>ADD CARD</Text>
+        </TouchableOpacity>
       </View>
     </View>
   );
