@@ -141,6 +141,9 @@ export const CardListItem = ({
   const ImageMap = {
       'metro': require('../assets/logos/metro.jpg'),
       'billa': require('../assets/logos/billa.png'),
+      'kaufland': require('../assets/logos/kaufland.png'),
+      'decathlon': require('../assets/logos/decathlon.png'),
+      'lidl': require('../assets/logos/lidl.png'),
       'default': require('../assets/logos/none.png')
   }
   
@@ -162,7 +165,7 @@ export const CardListItem = ({
                 paddingLeft: 5, paddingRight: 5,
             }}
         />
-        <Text> {card.title} </Text>
+        <Text style={{paddingLeft: 5}} > {card.title} </Text>
         <Menu ref={c => (menu = c)} >
             <MenuTrigger text='' />
             <MenuOptions customStyles={{
